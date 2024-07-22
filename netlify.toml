@@ -1,5 +1,5 @@
 [functions]
-  external_node_modules = ["express", "web-push", "lowdb"]
+  external_node_modules = ["express", "web-push", "lowdb", "node-fetch"]
   node_bundler = "esbuild"
 
 [[redirects]]
