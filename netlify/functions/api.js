@@ -3,7 +3,7 @@ const express = require("express")
 const serverless = require("serverless-http")
 const webpush = require("web-push")
 const bodyParser = require("body-parser")
-const cors = require("cors")
+const cors = require("cors") // Use CORS middleware
 
 async function setupDB() {
   const { Low } = await import("lowdb")
@@ -63,28 +63,9 @@ async function setupDB() {
   }
 
   const app = express()
-  app.use(cors())
+  app.use(cors()) // Enable CORS for all routes
   app.use(bodyParser.json())
   app.use(express.static("public"))
-
-  // Middleware to add CORS headers
-  app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*")
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-    )
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "X-Requested-With,content-type"
-    )
-    res.setHeader("Access-Control-Allow-Credentials", true)
-    if (req.method === "OPTIONS") {
-      res.sendStatus(200)
-    } else {
-      next()
-    }
-  })
 
   app.post("/add-subscription", async (request, response) => {
     console.log("/add-subscription")
@@ -133,17 +114,6 @@ async function setupDB() {
       response.sendStatus(200)
     } else {
       response.sendStatus(409)
-    }
-  })
-
-  app.get("/fetch-example", async (request, response) => {
-    const fetch = (await import("node-fetch")).default
-    try {
-      const res = await fetch("https://api.example.com/data")
-      const data = await res.json()
-      response.json(data)
-    } catch (error) {
-      response.status(500).json({ error: "Failed to fetch data" })
     }
   })
 
