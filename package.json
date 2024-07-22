@@ -1,12 +1,12 @@
 {
   "name": "pwa-server",
   "version": "1.0.1",
-  "main": "netlify/functions/api.mjs",
+  "main": "netlify\\functions\\api.mjs",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run clean && nodemon api.mjs",
-    "dev": "nodemon --watch src netlify/functions/api.mjs",
+    "dev": "nodemon --watch src netlify\\functions\\api.mjs",
     "clean": "if exist .data\\db.json del .data\\db.json"
   },
   "author": "",
