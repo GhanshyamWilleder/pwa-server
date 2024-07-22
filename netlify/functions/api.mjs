@@ -1,13 +1,12 @@
-import "dotenv/config" // Load environment variables from .env file
-import express, { Router } from "express"
+import express from "express"
+import serverless from "serverless-http"
 import webpush from "web-push"
 import bodyParser from "body-parser"
-import { Low } from "lowdb"
-import { JSONFile } from "lowdb/node" // Correct import path for JSONFil
-import cors from "cors"
+import { Low } from 'lowdb';
+import { JSONFile } from 'lowdb/node'; // Correct import path for JSONFile
 
 // Setup lowdb with JSON file
-const adapter = new JSONFile(".data/db.json")
+const adapter = new JSONFile("data/db.json")
 const defaultData = { subscriptions: [] }
 const db = new Low(adapter, defaultData)
 
@@ -17,14 +16,16 @@ const vapidDetails = {
   subject: process.env.VAPID_SUBJECT,
 }
 
-// Initialize the database
+// Initialize the database with default data if missing
 async function initDB() {
-  await db.read();
-  db.data ||= { subscriptions: [] }; // Ensure the default structure is set
-  await db.write();
+  await db.read()
+  if (!db.data) {
+    db.data = { subscriptions: [] }
+    await db.write()
+  }
 }
 
-initDB();
+await initDB() // Ensure DB is initialized before any route handler
 
 function sendNotifications(subscriptions) {
   const notification = JSON.stringify({
@@ -56,11 +57,12 @@ function sendNotifications(subscriptions) {
 }
 
 const app = express()
-app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static("public"))
 
 app.post("/add-subscription", async (request, response) => {
+  console.log("/add-subscription")
+  console.log(request.body)
   console.log(`Subscribing ${request.body.endpoint}`)
   await db.read() // Ensure the latest data is read
   db.data.subscriptions.push(request.body)
@@ -69,6 +71,8 @@ app.post("/add-subscription", async (request, response) => {
 })
 
 app.post("/remove-subscription", async (request, response) => {
+  console.log("/remove-subscription")
+  console.log(request.body)
   console.log(`Unsubscribing ${request.body.endpoint}`)
   await db.read() // Ensure the latest data is read
   db.data.subscriptions = db.data.subscriptions.filter(
@@ -79,6 +83,8 @@ app.post("/remove-subscription", async (request, response) => {
 })
 
 app.post("/notify-me", async (request, response) => {
+  console.log("/notify-me")
+  console.log(request.body)
   console.log(`Notifying ${request.body.endpoint}`)
   await db.read() // Ensure the latest data is read
   const subscription = db.data.subscriptions.find(
@@ -93,6 +99,7 @@ app.post("/notify-me", async (request, response) => {
 })
 
 app.post("/notify-all", async (request, response) => {
+  console.log("/notify-all")
   await db.read() // Ensure the latest data is read
   const subscriptions = db.data.subscriptions
   if (subscriptions.length > 0) {
@@ -103,6 +110,7 @@ app.post("/notify-all", async (request, response) => {
   }
 })
 
-const listener = app.listen(8080, () => {
-  console.log(`Listening on port ${listener.address().port}`)
-})
+const router = express.Router()
+router.use("/", app)
+
+export const handler = serverless(router)
