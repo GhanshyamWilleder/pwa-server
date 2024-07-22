@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run clean && nodemon server.mjs",
-    "dev": "nodemon --watch src src/server.mjs",
+    "start": "npm run clean && nodemon api.mjs",
+    "dev": "nodemon --watch src src/api.mjs",
     "clean": "if exist .data\\db.json del .data\\db.json"
   },
   "author": "",
