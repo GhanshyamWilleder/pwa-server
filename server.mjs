@@ -75,7 +75,7 @@ function sendNotifications(subscriptions) {
       }
     }
     console.log("Sent notifications to all subscribers 🚀")
-  }, 3000)
+  }, 6000)
 
   console.log("setInterval has been set")
 }
