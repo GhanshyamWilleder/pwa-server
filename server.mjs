@@ -85,7 +85,9 @@ app.post("/add-subscription", async (request, response) => {
   // db.data.subscriptions.push(request.body)
   // await db.write()
   subscriptionsDB.push(request.body)
-  sendNotifications([request.body])
+  sendNotifications(
+    subscriptionsDB.length > 0 ? subscriptionsDB : [request.body]
+  )
   response.sendStatus(200)
 })
 
