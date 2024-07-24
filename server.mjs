@@ -17,6 +17,7 @@ const vapidDetails = {
   subject: process.env.VAPID_SUBJECT,
 }
 
+const port = process.env.PORT || 4000
 // Initialize the database
 async function initDB() {
   await db.read();
@@ -103,6 +104,6 @@ app.post("/notify-all", async (request, response) => {
   }
 })
 
-const listener = app.listen(8080, () => {
+const listener = app.listen(port, () => {
   console.log(`Listening on port ${listener.address().port}`)
 })
