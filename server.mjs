@@ -100,7 +100,7 @@ app.post("/remove-subscription", async (request, response) => {
   subscriptionsDB = subscriptionsDB.filter(
     (sub) => sub.endpoint !== request.body.endpoint
   )
-  subscriptionsDB.length == 0 && clearImmediate(timerId)
+  subscriptionsDB = []
   response.sendStatus(200)
 })
 
