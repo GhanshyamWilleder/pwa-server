@@ -1,11 +1,19 @@
 {
   "subscriptions": [
     {
-      "endpoint": "https://fcm.googleapis.com/fcm/send/cMnlwFbj63c:APA91bHI4sSoPiEFlaghDtRZNCQ-cuNOFulAPvs7tMJhI6Da1JyO-ENz9KtXiZrXEFkSyICdMHXoV7rzV0X5qHBQ_PUws5Et69E4lABtAcI03HCv9nntBX7_ysEwLR-fgWpsoiPJuE-8",
+      "endpoint": "https://fcm.googleapis.com/fcm/send/eOn0PPMZuvs:APA91bEUhWG7zZ-g46Ny94rjB71DSd971zOdtDzbyAlKF4Xd5zkmu0cDRA1Qh0VoCfS4sBXmoQ2x3m1jCT7xbvD7E36Zsj8KJc9tdZKclGJXB5r6Tj3-Qub5lqjpqLaYwJjDFxiB02ct",
       "expirationTime": null,
       "keys": {
-        "p256dh": "BNBGh5hbztTLixlGOy6WOpgdA-V8HKU9JnsYU0RKSiHKCZn9gMPAEKdHsM37vnsXQDj6DJk6L4UKN86J1Yol8Dg",
-        "auth": "JX3O-JpdGabFJ8UBCOj8AA"
+        "p256dh": "BP1BuD4ZymQF5RQJJCUhNfPacKHlfrNpXqNIcnTO72UegEn7GPQQI5wuMYTeOFo4iVPrBf-jIv3gqhfAvg2abuI",
+        "auth": "Kd7DZhv8BJJVaamr4rbxaA"
+      }
+    },
+    {
+      "endpoint": "https://fcm.googleapis.com/fcm/send/cEDyuutKA_k:APA91bGsuq74T6S5jC13XizlJNGleSBXGltjzid7Q0IoPlqPIHrntKgc1R8b4K-jimm1X2CQwg7XvSG_7j705I7FyxkxGctTmM_K0ONlY7L_eq2kfehDEnYAr3CQm1kUNl8o8r1KZQ71",
+      "expirationTime": null,
+      "keys": {
+        "p256dh": "BKKtjb97t-fUQIus-w4Avqi-7oXiwELzP1szlmfHvdGJjkajB3QTsAWlNo81CD16UI3qK6GMG9f7x4uzwaO7xyU",
+        "auth": "tyPNND3aH14v0-TETnsf9A"
       }
     }
   ]

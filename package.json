@@ -1,14 +1,14 @@
 {
   "name": "pwa-server",
   "version": "1.0.1",
-  "main": "api.js",
-  "type": "commonjs",
+  "main": "server.mjs",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run clean && nodemon api.js",
-    "dev": "nodemon --watch src api.js",
+    "start": "npm run clean && nodemon server.mjs",
+    "dev": "nodemon --watch src server.mjs",
     "clean": "if exist .data\\db.json del .data\\db.json",
-    "serve": "node api.js"
+    "serve": "node server.mjs"
   },
   "author": "",
   "license": "ISC",

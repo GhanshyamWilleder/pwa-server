@@ -1,15 +1,20 @@
-import "dotenv/config" // Load environment variables from .env file
-import express, { Router } from "express"
+import "dotenv/config"
+import express from "express"
+import serverless from "serverless-http"
 import webpush from "web-push"
 import bodyParser from "body-parser"
-import { Low } from "lowdb"
-import { JSONFile } from "lowdb/node" // Correct import path for JSONFil
 import cors from "cors"
+import wordlist from "./data/wordlist.json" assert { type: "json" }
+// import { Low } from "lowdb"
+// import { JSONFile } from "lowdb/node"
 
-// Setup lowdb with JSON file
-const adapter = new JSONFile(".data/db.json")
-const defaultData = { subscriptions: [] }
-const db = new Low(adapter, defaultData)
+const app = express()
+app.use(cors()) // Enable CORS for all routes
+app.use(bodyParser.json())
+app.use(express.static("public"))
+
+let timerId
+let subscriptionsDB = []
 
 const vapidDetails = {
   publicKey: process.env.VAPID_PUBLIC_KEY,
@@ -17,72 +22,92 @@ const vapidDetails = {
   subject: process.env.VAPID_SUBJECT,
 }
 
-const port = process.env.PORT || 4000
-// Initialize the database
-async function initDB() {
-  await db.read();
-  db.data ||= { subscriptions: [] }; // Ensure the default structure is set
-  await db.write();
-}
+// const adapter = new JSONFile("data/db.json")
+// const defaultData = { subscriptions: [] }
+// const db = new Low(adapter, defaultData)
 
-initDB();
+// async function initDB() {
+//   await db.read()
+//   if (!db.data) {
+//     db.data = { subscriptions: [] }
+//     await db.write()
+//   }
+//   console.log("DB initialized with subscriptions:", db.data.subscriptions)
+// }
 
 function sendNotifications(subscriptions) {
-  const notification = JSON.stringify({
-    title: "Hello, Notifications!",
-    options: {
-      body: `ID: ${Math.floor(Math.random() * 100)}`,
-    },
-  })
+  console.log("sendNotifications called with subscriptions:", subscriptions)
 
-  const options = {
-    TTL: 10000,
-    vapidDetails: vapidDetails,
+  // Clear any existing interval
+  if (timerId) {
+    clearInterval(timerId)
   }
 
-  subscriptions.forEach((subscription) => {
-    const endpoint = subscription.endpoint
-    const id = endpoint.substr(endpoint.length - 8, endpoint.length)
-    webpush
-      .sendNotification(subscription, notification, options)
-      .then((result) => {
-        console.log(`Endpoint ID: ${id}`)
-        console.log(`Result: ${result.statusCode}`)
-      })
-      .catch((error) => {
-        console.log(`Endpoint ID: ${id}`)
-        console.log(`Error: ${error}`)
-      })
-  })
+  timerId = setInterval(async () => {
+    console.log("setInterval triggered")
+
+    const randomWord =
+      wordlist.words[Math.floor(Math.random() * wordlist.words.length)]
+    const notification = JSON.stringify({
+      title: randomWord.word,
+      options: {
+        body: randomWord.definition,
+      },
+    })
+
+    for (const subscription of subscriptions) {
+      const endpoint = subscription.endpoint
+      const id = endpoint.substr(endpoint.length - 8, endpoint.length)
+      const options = {
+        vapidDetails,
+        TTL: 60,
+      }
+
+      try {
+        const result = await webpush.sendNotification(
+          subscription,
+          notification,
+          options
+        )
+        console.log(`Notification sent to ${id}`, result)
+      } catch (error) {
+        console.error(`Failed to send notification to ${id}:`, error)
+      }
+    }
+    console.log("Sent notifications to all subscribers 🚀")
+  }, 3000)
+
+  console.log("setInterval has been set")
 }
 
-const app = express()
-app.use(cors())
-app.use(bodyParser.json())
-app.use(express.static("public"))
-
 app.post("/add-subscription", async (request, response) => {
-  console.log(`Subscribing ${request.body.endpoint}`)
-  await db.read() // Ensure the latest data is read
-  db.data.subscriptions.push(request.body)
-  await db.write()
+  // await db.read()
+  // db.data.subscriptions.push(request.body)
+  // await db.write()
+  subscriptionsDB.push(request.body)
+  sendNotifications([request.body])
   response.sendStatus(200)
 })
 
 app.post("/remove-subscription", async (request, response) => {
-  console.log(`Unsubscribing ${request.body.endpoint}`)
-  await db.read() // Ensure the latest data is read
-  db.data.subscriptions = db.data.subscriptions.filter(
+  // await db.read()
+  // db.data.subscriptions = db.data.subscriptions.filter(
+  //   (sub) => sub.endpoint !== request.body.endpoint
+  // )
+  // await db.write()
+  subscriptionsDB = subscriptionsDB.filter(
     (sub) => sub.endpoint !== request.body.endpoint
   )
-  await db.write()
+  subscriptionsDB.length == 0 && clearImmediate(timerId)
   response.sendStatus(200)
 })
 
 app.post("/notify-me", async (request, response) => {
-  console.log(`Notifying ${request.body.endpoint}`)
-  await db.read() // Ensure the latest data is read
-  const subscription = db.data.subscriptions.find(
+  // await db.read()
+  // const subscription = db.data.subscriptions.find(
+  //   (sub) => sub.endpoint === request.body.endpoint
+  // )
+  const subscription = subscriptionsDB.find(
     (sub) => sub.endpoint === request.body.endpoint
   )
   if (subscription) {
@@ -94,8 +119,9 @@ app.post("/notify-me", async (request, response) => {
 })
 
 app.post("/notify-all", async (request, response) => {
-  await db.read() // Ensure the latest data is read
-  const subscriptions = db.data.subscriptions
+  // await db.read()
+  // const subscriptions = db.data.subscriptions
+  const subscriptions = subscriptionsDB
   if (subscriptions.length > 0) {
     sendNotifications(subscriptions)
     response.sendStatus(200)
@@ -104,6 +130,19 @@ app.post("/notify-all", async (request, response) => {
   }
 })
 
-const listener = app.listen(port, () => {
-  console.log(`Listening on port ${listener.address().port}`)
+const port = process.env.PORT || 8080
+
+// initDB().then(() => {
+//   app.listen(port, () => {
+//     console.log(`Server is running on port ${port}`)
+//   })
+// })
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`)
 })
+
+// const router = express.Router()
+// router.use("/", app)
+
+// export const handler = serverless(router)
