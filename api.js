@@ -128,14 +128,10 @@ async function setupDB() {
   return { handler: serverless(router), app }
 }
 
-if (process.env.NODE_ENV !== "production") {
-  setupDB().then(({ app }) => {
-    const PORT = 8080
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`)
-    })
-  })
-}
+const port = process.env.PORT || 8080
 
-module.exports.handler = (event, context) =>
-  setupDB().then(({ handler }) => handler(event, context))
+setupDB().then(({ app }) => {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`)
+  })
+})
