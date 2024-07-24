@@ -100,7 +100,8 @@ app.post("/remove-subscription", async (request, response) => {
   subscriptionsDB = subscriptionsDB.filter(
     (sub) => sub.endpoint !== request.body.endpoint
   )
-  subscriptionsDB = []
+
+  sendNotifications(subscriptionsDB ? subscriptionsDB : [])
   response.sendStatus(200)
 })
 
