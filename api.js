@@ -31,7 +31,10 @@ async function setupDB() {
 
   await initDB() // Ensure DB is initialized before any route handler
 
-  async function sendNotifications(subscriptions) {
+  setInterval(async () => {
+    await db.read() // Ensure the latest data is read
+    const subscriptions = db.data.subscriptions
+
     const notification = JSON.stringify({
       title: "Hello, Notifications!",
       options: {
@@ -53,6 +56,7 @@ async function setupDB() {
           notification,
           options
         )
+        console.log(result)
         console.log(`Endpoint ID: ${id}`)
         console.log(`Result: ${result.statusCode}`)
       } catch (error) {
@@ -60,7 +64,8 @@ async function setupDB() {
         console.log(`Error: ${error}`)
       }
     }
-  }
+    console.log("Notifications sent")
+  }, 3000)
 
   const app = express()
   app.use(cors()) // Enable CORS for all routes

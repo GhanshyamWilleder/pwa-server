@@ -1,9 +1,0 @@
-[functions]
-  external_node_modules = ["express", "web-push", "lowdb", "node-fetch"]
-  node_bundler = "esbuild"
-
-[[redirects]]
-  force = true
-  from = "/api/*"
-  status = 200
-  to = "/api/:splat"
