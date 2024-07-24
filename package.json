@@ -1,13 +1,14 @@
 {
   "name": "pwa-server",
   "version": "1.0.1",
-  "main": "netlify\\functions\\api.js",
+  "main": "api.js",
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run clean && nodemon netlify\\functions\\api.js",
-    "dev": "nodemon --watch src netlify\\functions\\api.js",
-    "clean": "if exist .data\\db.json del .data\\db.json"
+    "start": "npm run clean && nodemon api.js",
+    "dev": "nodemon --watch src api.js",
+    "clean": "if exist .data\\db.json del .data\\db.json",
+    "serve": "node api.js"
   },
   "author": "",
   "license": "ISC",
